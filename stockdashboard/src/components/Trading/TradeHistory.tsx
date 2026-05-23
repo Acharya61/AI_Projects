@@ -1,7 +1,9 @@
 import { useStore } from '../../store/store'
+import { formatPrice } from '../../data/currencies'
 
 export function TradeHistory() {
   const trades = useStore(s => s.portfolio.trades)
+  const currency = useStore(s => s.prices.activeCurrency)
 
   if (trades.length === 0) {
     return (
@@ -33,7 +35,7 @@ export function TradeHistory() {
               {t.side.toUpperCase()}
             </span>
             <span className="text-right">{t.quantity}</span>
-            <span className="text-right">${t.price.toFixed(2)}</span>
+            <span className="text-right">{formatPrice(t.price, currency)}</span>
           </div>
         ))}
       </div>

@@ -1,4 +1,6 @@
 import type { Position } from '../../lib/types'
+import { useStore } from '../../store/store'
+import { formatPrice, formatPnl } from '../../data/currencies'
 
 interface Props {
   position: Position
@@ -6,6 +8,7 @@ interface Props {
 }
 
 export function PositionCard({ position, currentPrice }: Props) {
+  const currency = useStore(s => s.prices.activeCurrency)
   const marketValue = position.quantity * currentPrice
   const costBasis = position.quantity * position.avgEntry
   const unrealizedPL = marketValue - costBasis
@@ -18,12 +21,12 @@ export function PositionCard({ position, currentPrice }: Props) {
         <div className="text-[var(--text-secondary)]">{position.quantity} shares</div>
       </div>
       <div className="text-right">
-        <div>${currentPrice.toFixed(2)}</div>
-        <div className="text-[var(--text-secondary)]">Avg ${position.avgEntry.toFixed(2)}</div>
+        <div>{formatPrice(currentPrice, currency)}</div>
+        <div className="text-[var(--text-secondary)]">Avg {formatPrice(position.avgEntry, currency)}</div>
       </div>
       <div className="text-right">
         <div className={unrealizedPL >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}>
-          {unrealizedPL >= 0 ? '+' : ''}${unrealizedPL.toFixed(2)}
+          {formatPnl(unrealizedPL, currency)}
         </div>
         <div className={unrealizedPL >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}>
           ({unrealizedPercent >= 0 ? '+' : ''}{unrealizedPercent.toFixed(2)}%)

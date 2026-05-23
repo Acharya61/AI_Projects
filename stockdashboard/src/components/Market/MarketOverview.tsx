@@ -1,10 +1,10 @@
 import { useStore } from '../../store/store'
-import { SYMBOLS } from '../../lib/constants'
 
 export function MarketOverview() {
   const ticks = useStore(s => s.prices.ticks)
+  const symbols = useStore(s => s.prices.symbols)
 
-  const sorted = [...SYMBOLS]
+  const sorted = [...symbols]
     .map(s => ({ ...s, tick: ticks[s.symbol] }))
     .filter(s => s.tick)
     .sort((a, b) => Math.abs(b.tick!.changePercent) - Math.abs(a.tick!.changePercent))

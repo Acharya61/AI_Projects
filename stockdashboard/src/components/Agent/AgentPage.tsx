@@ -1,5 +1,7 @@
 import { useState, useCallback, useEffect } from 'react'
 import { useAgent } from '../../hooks/useAgent'
+import { useStore } from '../../store/store'
+import { formatPrice, formatPnl } from '../../data/currencies'
 import { agentBridge } from '../../lib/agentBridge'
 
 type Phase = 'idle' | 'scanning' | 'scanned' | 'predicting' | 'analyzing' | 'trading' | 'complete'
@@ -123,6 +125,7 @@ function PredictionPanel({ symbols: _symbols }: { symbols: string[] }) {
   const [prices, setPrices] = useState<Record<string, number>>({})
   const [loading, setLoading] = useState(false)
   const [horizon, setHorizon] = useState(10)
+  const currency = useStore(s => s.prices.activeCurrency)
 
   const handlePredict = useCallback(() => {
     if (!agentBridge.connected) return
@@ -173,11 +176,11 @@ function PredictionPanel({ symbols: _symbols }: { symbols: string[] }) {
                   <td className="font-bold text-[var(--yellow)]">{sym}</td>
                   <td className="text-[10px]">{sname}</td>
                   <td className="text-right text-[var(--text-secondary)]">
-                    ${prices[sym]?.toFixed(2) ?? '—'}
+                    {prices[sym] ? formatPrice(prices[sym], currency) : '—'}
                   </td>
                   <td className="text-right">
                     <span className={pred.predicted_price_ticks >= (prices[sym] || 0) ? 'text-[var(--green)]' : 'text-[var(--red)]'}>
-                      ${pred.predicted_price_ticks?.toFixed(2)}
+                      {formatPrice(pred.predicted_price_ticks, currency)}
                     </span>
                   </td>
                   <td className={`text-right ${pred.expected_return >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
@@ -208,6 +211,7 @@ function SessionPanel() {
   const [status, setStatus] = useState<any>({})
   const [timeLeft, setTimeLeft] = useState(0)
   const [preTimeLeft, setPreTimeLeft] = useState(0)
+  const currency = useStore(s => s.prices.activeCurrency)
 
   useEffect(() => {
     const unsubUpdate = agentBridge.on('session_update', (data) => {
@@ -329,12 +333,12 @@ function SessionPanel() {
           <div className="grid grid-cols-2 gap-2">
             <div className="bg-[var(--bg-tertiary)] rounded p-2">
               <div className="text-[10px] text-[var(--text-secondary)]">Equity</div>
-              <div className="text-sm font-bold">${status.equity?.toFixed(2) ?? '--'}</div>
+              <div className="text-sm font-bold">{formatPrice(status.equity ?? 0, currency)}</div>
             </div>
             <div className="bg-[var(--bg-tertiary)] rounded p-2">
               <div className="text-[10px] text-[var(--text-secondary)]">P&L</div>
               <div className={`text-sm font-bold ${(status.totalPnl ?? 0) >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
-                {(status.totalPnl ?? 0) >= 0 ? '+' : ''}${status.totalPnl?.toFixed(2) ?? '--'}
+                {formatPnl(status.totalPnl ?? 0, currency)}
               </div>
             </div>
           </div>
@@ -354,7 +358,7 @@ function SessionPanel() {
         <div className="space-y-3">
           <div className={`text-center py-3 rounded ${sessionResult.total_pnl >= 0 ? 'bg-green-900/30' : 'bg-red-900/30'}`}>
             <div className="text-2xl font-bold">
-              {sessionResult.total_pnl >= 0 ? '+' : ''}${sessionResult.total_pnl?.toFixed(2) ?? '0'}
+              {formatPnl(sessionResult.total_pnl ?? 0, currency)}
             </div>
             <div className="text-[10px] text-[var(--text-secondary)]">
               {sessionResult.total_pnl >= 0 ? `Reward: +${sessionResult.reward?.toFixed(2)}` : `Punishment: -${sessionResult.punishment?.toFixed(2)}`}
@@ -426,6 +430,7 @@ function ConnectionPanel() {
 
 function AgentStatus() {
   const { state, lastAction, strategyName } = useAgent()
+  const currency = useStore(s => s.prices.activeCurrency)
   return (
     <div className="terminal-panel-dim p-3">
       <div className="section-title">Agent Status</div>
@@ -440,12 +445,12 @@ function AgentStatus() {
         </div>
         <div className="flex justify-between">
           <span className="text-[var(--text-secondary)]">Cash</span>
-          <span>${state.cash.toLocaleString()}</span>
+          <span>{formatPrice(state.cash, currency)}</span>
         </div>
         <div className="flex justify-between">
           <span className="text-[var(--text-secondary)]">P&L</span>
           <span className={state.totalPnl >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}>
-            {state.totalPnl >= 0 ? '+' : ''}${state.totalPnl.toFixed(2)}
+            {formatPnl(state.totalPnl, currency)}
           </span>
         </div>
         <div className="flex justify-between">

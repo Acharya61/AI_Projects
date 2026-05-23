@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom'
-import { SYMBOLS, BASE_PRICES } from '../../lib/constants'
+import { useStore } from '../../store/store'
+import { formatPrice } from '../../data/currencies'
 
 const links = [
   { to: '/', label: 'Dashboard', icon: '▣' },
@@ -15,7 +16,11 @@ const links = [
 ]
 
 export function Sidebar() {
-  const top = SYMBOLS.slice(0, 3)
+  const symbols = useStore(s => s.prices.symbols)
+  const ticks = useStore(s => s.prices.ticks)
+  const currency = useStore(s => s.prices.activeCurrency)
+  const top = symbols.slice(0, 3)
+
   return (
     <div className="w-44 shrink-0 bg-[var(--bg-secondary)] border-r border-[var(--border-dim)] flex flex-col overflow-hidden">
       <div className="h-10 flex items-center px-4 border-b border-[var(--border-dim)]">
@@ -37,14 +42,17 @@ export function Sidebar() {
         ))}
       </nav>
       <div className="border-t border-[var(--border-dim)] p-3 text-[10px] text-[var(--text-secondary)] space-y-1">
-        {top.map(s => (
-          <div key={s.symbol} className="flex justify-between">
-            <span>{s.symbol}</span>
-            <span className={BASE_PRICES[s.symbol] > 200 ? 'text-[var(--green)]' : 'text-[var(--red)]'}>
-              ${BASE_PRICES[s.symbol].toFixed(2)}
-            </span>
-          </div>
-        ))}
+        {top.map(s => {
+          const tick = ticks[s.symbol]
+          return (
+            <div key={s.symbol} className="flex justify-between">
+              <span>{s.symbol}</span>
+              <span className={tick && tick.price > 200 ? 'text-[var(--green)]' : 'text-[var(--red)]'}>
+                {tick ? formatPrice(tick.price, currency) : '—'}
+              </span>
+            </div>
+          )
+        })}
       </div>
     </div>
   )

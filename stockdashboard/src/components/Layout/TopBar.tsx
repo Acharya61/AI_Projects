@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react'
-import { SYMBOLS } from '../../lib/constants'
+import { useStore } from '../../store/store'
 
 function TickerTape() {
+  const symbols = useStore(s => s.prices.symbols)
+
   return (
     <div className="ticker-tape flex-1 mx-4">
       <div className="ticker-tape-inner">
         {[...Array(3)].map((_, i) => (
-          SYMBOLS.map(s => (
+          symbols.map(s => (
             <span key={`${s.symbol}-${i}`} className="mx-3 text-xs">
               <span className="text-[var(--yellow)]">{s.symbol}</span>
               <span className="ml-1 text-[var(--text-secondary)]">

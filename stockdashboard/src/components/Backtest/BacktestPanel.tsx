@@ -2,8 +2,8 @@ import { useState, useCallback } from 'react'
 import { useStore } from '../../store/store'
 import { STRATEGIES } from '../../lib/strategies'
 import { runBacktest } from '../../lib/backtest'
-import { SYMBOLS } from '../../lib/constants'
 import type { BacktestResult, StrategyParam } from '../../lib/types'
+import { formatPrice, formatPnl } from '../../data/currencies'
 
 function EquityCurve({ curve }: { curve: { time: number; equity: number }[] }) {
   if (curve.length < 2) return <div className="text-xs text-[var(--text-secondary)] py-4 text-center">Not enough data</div>
@@ -43,18 +43,18 @@ function MetricCard({ label, value, color }: { label: string; value: string; col
   )
 }
 
-function ResultsView({ result }: { result: BacktestResult }) {
+function ResultsView({ result, currency }: { result: BacktestResult; currency: string }) {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-4 gap-2">
-        <MetricCard label="Total Return" value={`$${result.totalReturn.toLocaleString()}`} color={result.totalReturn >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'} />
+        <MetricCard label="Total Return" value={formatPrice(result.totalReturn, currency)} color={result.totalReturn >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'} />
         <MetricCard label="Return %" value={`${result.totalReturnPercent >= 0 ? '+' : ''}${result.totalReturnPercent.toFixed(2)}%`} color={result.totalReturnPercent >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'} />
         <MetricCard label="Sharpe Ratio" value={result.sharpeRatio.toFixed(2)} />
         <MetricCard label="Max Drawdown" value={`${result.maxDrawdownPercent.toFixed(1)}%`} color="text-[var(--red)]" />
         <MetricCard label="Win Rate" value={`${result.winRate.toFixed(0)}%`} color={result.winRate >= 50 ? 'text-[var(--green)]' : 'text-[var(--red)]'} />
         <MetricCard label="Total Trades" value={result.totalTrades.toString()} />
-        <MetricCard label="Avg Win" value={`$${result.avgWin.toFixed(2)}`} color="text-[var(--green)]" />
-        <MetricCard label="Avg Loss" value={`-$${result.avgLoss.toFixed(2)}`} color="text-[var(--red)]" />
+        <MetricCard label="Avg Win" value={formatPrice(result.avgWin, currency)} color="text-[var(--green)]" />
+        <MetricCard label="Avg Loss" value={`-${formatPrice(result.avgLoss, currency)}`} color="text-[var(--red)]" />
       </div>
 
       <div>
@@ -80,10 +80,10 @@ function ResultsView({ result }: { result: BacktestResult }) {
               <div key={i} className="grid grid-cols-6 px-2 py-1 hover:bg-gray-800/30">
                 <span>{new Date(t.entryTime * 1000).toLocaleDateString()}</span>
                 <span>{new Date(t.exitTime * 1000).toLocaleDateString()}</span>
-                <span className="text-right">${t.entryPrice.toFixed(2)}</span>
-                <span className="text-right">${t.exitPrice.toFixed(2)}</span>
+                <span className="text-right">{formatPrice(t.entryPrice, currency)}</span>
+                <span className="text-right">{formatPrice(t.exitPrice, currency)}</span>
                 <span className={`text-right ${t.pnl >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
-                  {t.pnl >= 0 ? '+' : ''}${t.pnl.toFixed(2)}
+                  {formatPnl(t.pnl, currency)}
                 </span>
                 <span className="truncate text-[var(--text-secondary)]">{t.reason}</span>
               </div>
@@ -97,13 +97,17 @@ function ResultsView({ result }: { result: BacktestResult }) {
 
 export function BacktestPanel() {
   const [open, setOpen] = useState(false)
-  const [symbol, setSymbol] = useState(SYMBOLS[0].symbol)
+  const [symbol, setSymbol] = useState('')
   const [strategyIdx, setStrategyIdx] = useState(0)
   const [strategyParams, setStrategyParams] = useState<Record<string, number>>({})
   const [result, setResult] = useState<BacktestResult | null>(null)
   const [running, setRunning] = useState(false)
 
+  const symbols = useStore(s => s.prices.symbols)
   const history = useStore(s => s.prices.history)
+  const currency = useStore(s => s.prices.activeCurrency)
+
+  const resolvedSymbol = symbol || symbols[0]?.symbol || ''
 
   const strategy = STRATEGIES[strategyIdx]
 
@@ -118,7 +122,7 @@ export function BacktestPanel() {
   }, [])
 
   const handleRun = useCallback(() => {
-    const prices = history[symbol]
+    const prices = history[resolvedSymbol]
     if (!prices || prices.length < 10) return
 
     setRunning(true)
@@ -140,7 +144,7 @@ export function BacktestPanel() {
       setResult(res)
       setRunning(false)
     }, 50)
-  }, [symbol, strategy, strategyParams, history])
+  }, [resolvedSymbol, strategy, strategyParams, history])
 
   return (
     <>
@@ -166,11 +170,11 @@ export function BacktestPanel() {
               <div>
                 <label className="text-xs text-[var(--text-secondary)] block mb-1">Symbol</label>
                 <select
-                  value={symbol}
+                  value={resolvedSymbol}
                   onChange={e => setSymbol(e.target.value)}
                   className="bg-[var(--bg-tertiary)] text-white px-2 py-1.5 rounded text-sm outline-none border border-transparent focus:border-gray-500"
                 >
-                  {SYMBOLS.map(s => <option key={s.symbol} value={s.symbol}>{s.symbol}</option>)}
+                  {symbols.map(s => <option key={s.symbol} value={s.symbol}>{s.symbol}</option>)}
                 </select>
               </div>
 
@@ -213,7 +217,7 @@ export function BacktestPanel() {
 
             <div className="text-xs text-[var(--text-secondary)] mb-4">{strategy.description}</div>
 
-            {result && <ResultsView result={result} />}
+            {result && <ResultsView result={result} currency={currency} />}
             {!result && !running && (
               <div className="text-center py-8 text-sm text-[var(--text-secondary)]">
                 Configure and click <span className="text-[var(--yellow)]">Run</span> to backtest

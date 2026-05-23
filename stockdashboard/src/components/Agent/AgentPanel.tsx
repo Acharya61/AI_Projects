@@ -1,8 +1,8 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { useAgent } from '../../hooks/useAgent'
 import { useStore } from '../../store/store'
+import { formatPrice, formatPnl } from '../../data/currencies'
 import { agentBridge } from '../../lib/agentBridge'
-import { SYMBOLS } from '../../lib/constants'
 
 const STRATEGY_OPTIONS = [
   { value: 'sma', label: 'SMA Crossover' },
@@ -16,19 +16,29 @@ export function AgentPanel() {
   const [host, setHost] = useState('localhost:8765')
   const tickRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
+  const symbols = useStore(s => s.prices.symbols)
+  const activeMarket = useStore(s => s.prices.activeMarket)
+  const currency = useStore(s => s.prices.activeCurrency)
+
   const {
     connected, connecting, error, state, lastAction, strategyName,
     trainProgress, connect, disconnect, startAgent, stopAgent,
     resetAgent, trainAgent,
   } = useAgent()
 
-  const [selectedSymbol, setSelectedSymbol] = useState(SYMBOLS[0].symbol)
+  const [selectedSymbol, setSelectedSymbol] = useState(symbols[0]?.symbol || '')
   const [selectedStrategy, setSelectedStrategy] = useState('ensemble')
   const [fastPeriod, setFastPeriod] = useState(5)
   const [slowPeriod, setSlowPeriod] = useState(20)
   const [epsilon] = useState(0.2)
   const [learningRate] = useState(0.1)
   const [trainEpisodes] = useState(50)
+
+  useEffect(() => {
+    if (symbols.length > 0 && !symbols.some(s => s.symbol === selectedSymbol)) {
+      setSelectedSymbol(symbols[0].symbol)
+    }
+  }, [symbols, selectedSymbol])
 
   const handleStart = useCallback(() => {
     startAgent({
@@ -124,12 +134,17 @@ export function AgentPanel() {
 
             {connected && (
               <>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-[10px] text-[var(--text-secondary)] bg-[var(--bg-tertiary)] px-2 py-0.5 rounded">
+                    Market: {activeMarket}
+                  </span>
+                </div>
                 <div className="flex flex-wrap gap-3 mb-4">
                   <div>
                     <label className="text-xs text-[var(--text-secondary)] block mb-1">Symbol</label>
                     <select value={selectedSymbol} onChange={e => setSelectedSymbol(e.target.value)}
                       className="bg-[var(--bg-tertiary)] text-white px-2 py-1.5 rounded text-sm outline-none border border-transparent focus:border-gray-500">
-                      {SYMBOLS.map(s => <option key={s.symbol} value={s.symbol}>{s.symbol}</option>)}
+                      {symbols.map(s => <option key={s.symbol} value={s.symbol}>{s.symbol}</option>)}
                     </select>
                   </div>
                   <div>
@@ -187,14 +202,14 @@ export function AgentPanel() {
                     <span className={state.running ? 'text-[var(--green)]' : ''}>{state.running ? 'Running' : 'Idle'}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[var(--text-secondary)]">Cash</span><span>${state.cash.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                    <span className="text-[var(--text-secondary)]">Cash</span><span>{formatPrice(state.cash, currency)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-[var(--text-secondary)]">Position</span><span>{state.position} shares</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-[var(--text-secondary)]">Total P&L</span>
-                    <span className={state.totalPnl >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}>{state.totalPnl >= 0 ? '+' : ''}${state.totalPnl.toFixed(2)}</span>
+                    <span className={state.totalPnl >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}>{formatPnl(state.totalPnl, currency)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-[var(--text-secondary)]">Trades</span><span>{state.tradeCount}</span>
@@ -218,8 +233,8 @@ export function AgentPanel() {
                       {state.trades.map((t, i) => (
                         <div key={i} className="flex justify-between px-2 py-1 hover:bg-gray-800/30">
                           <span className={t.side === 'buy' ? 'text-[var(--green)]' : 'text-[var(--red)]'}>{t.side.toUpperCase()}</span>
-                          <span>{t.quantity} @ ${t.price.toFixed(2)}</span>
-                          <span className={t.pnl >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}>{t.pnl >= 0 ? '+' : ''}${t.pnl.toFixed(2)}</span>
+                          <span>{t.quantity} @ {formatPrice(t.price, currency)}</span>
+                          <span className={t.pnl >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}>{formatPnl(t.pnl, currency)}</span>
                           <span className="text-[var(--text-secondary)]">{t.reason}</span>
                         </div>
                       ))}
@@ -232,7 +247,7 @@ export function AgentPanel() {
             {!connected && !connecting && !error && (
               <div className="text-center py-6 text-sm text-[var(--text-secondary)]">
                 <p className="mb-2">Start the Python agent server first:</p>
-                <code className="bg-[var(--bg-primary)] px-3 py-1.5 rounded text-xs">cd F:\AIProjects\TradingAgent &amp;&amp; run.bat</code>
+                <code className="bg-[var(--bg-primary)] px-3 py-1.5 rounded text-xs">cd F:\AIProjects\TradingAgent && run.bat</code>
                 <p className="mt-2 text-xs">Then click <span className="text-[var(--yellow)]">Connect</span></p>
               </div>
             )}

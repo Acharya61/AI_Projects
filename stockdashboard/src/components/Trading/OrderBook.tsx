@@ -1,8 +1,10 @@
 import { useStore } from '../../store/store'
 import { useOrderBook } from '../../hooks/useOrderBook'
+import { formatPrice } from '../../data/currencies'
 
 export function OrderBook() {
   const activeSymbol = useStore(s => s.prices.activeSymbol)
+  const currency = useStore(s => s.prices.activeCurrency)
   const orderBook = useOrderBook(activeSymbol)
 
   if (!orderBook) return null
@@ -41,7 +43,7 @@ export function OrderBook() {
             <span className="text-[var(--green)]">{orderBook.bids[0]?.price.toFixed(2)}</span>
             <span className="text-[var(--text-secondary)] mx-2">—</span>
             <span className="text-[var(--red)]">{orderBook.asks[0]?.price.toFixed(2)}</span>
-            <span className="text-[var(--text-secondary)] text-xs ml-2">Spread: ${orderBook.spread.toFixed(2)}</span>
+            <span className="text-[var(--text-secondary)] text-xs ml-2">Spread: {formatPrice(orderBook.spread, currency)}</span>
           </div>
         )}
 

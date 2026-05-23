@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useSession } from '../../hooks/useSession'
+import { useStore } from '../../store/store'
+import { formatPrice, formatPnl } from '../../data/currencies'
 
 export function SessionPanel() {
   const [open, setOpen] = useState(false)
+  const currency = useStore(s => s.prices.activeCurrency)
   const {
     active,
     status,
@@ -120,17 +123,17 @@ export function SessionPanel() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="bg-[var(--bg-tertiary)] rounded p-3">
                       <div className="text-xs text-[var(--text-secondary)]">Equity</div>
-                      <div className="text-lg font-bold">${status.equity?.toFixed(2) ?? '--'}</div>
+                      <div className="text-lg font-bold">{formatPrice(status.equity ?? 0, currency)}</div>
                     </div>
                     <div className="bg-[var(--bg-tertiary)] rounded p-3">
                       <div className="text-xs text-[var(--text-secondary)]">Total P&L</div>
                       <div className={`text-lg font-bold ${(status.totalPnl ?? 0) >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
-                        {(status.totalPnl ?? 0) >= 0 ? '+' : ''}${status.totalPnl?.toFixed(2) ?? '--'}
+                        {formatPnl(status.totalPnl ?? 0, currency)}
                       </div>
                     </div>
                     <div className="bg-[var(--bg-tertiary)] rounded p-3">
                       <div className="text-xs text-[var(--text-secondary)]">Cash</div>
-                      <div className="text-lg font-bold">${status.cash?.toFixed(2) ?? '--'}</div>
+                      <div className="text-lg font-bold">{formatPrice(status.cash ?? 0, currency)}</div>
                     </div>
                     <div className="bg-[var(--bg-tertiary)] rounded p-3">
                       <div className="text-xs text-[var(--text-secondary)]">Trades</div>
@@ -154,7 +157,7 @@ export function SessionPanel() {
                         {Object.entries(status.positions).map(([sym, pos]) => (
                           <div key={sym} className="bg-[var(--bg-tertiary)] rounded px-3 py-2 flex justify-between text-xs">
                             <span className="font-medium">{sym}</span>
-                            <span>{pos.quantity} shares @ ${pos.avgEntry.toFixed(2)}</span>
+                            <span>{pos.quantity} shares @ {formatPrice(pos.avgEntry, currency)}</span>
                           </div>
                         ))}
                       </div>
@@ -176,7 +179,7 @@ export function SessionPanel() {
 
                   <div className={`text-center py-6 rounded ${result.totalPnl >= 0 ? 'bg-green-900/30' : 'bg-red-900/30'}`}>
                     <div className="text-3xl font-bold mb-1">
-                      {result.totalPnl >= 0 ? '+' : ''}${result.totalPnl.toFixed(2)}
+                      {formatPnl(result.totalPnl, currency)}
                     </div>
                     <div className="text-xs text-[var(--text-secondary)]">
                       {result.totalPnl >= 0
@@ -232,9 +235,9 @@ export function SessionPanel() {
                           <div key={i} className="flex items-center justify-between bg-[var(--bg-tertiary)] rounded px-3 py-1.5 text-xs">
                             <span className="font-medium w-12">{t.symbol}</span>
                             <span className={t.side === 'sell' ? 'text-[var(--green)]' : 'text-[var(--red)]'}>{t.side}</span>
-                            <span>{t.quantity} @ ${t.entryPrice.toFixed(2)} &rarr; ${t.exitPrice.toFixed(2)}</span>
+                            <span>{t.quantity} @ {formatPrice(t.entryPrice, currency)} &rarr; {formatPrice(t.exitPrice, currency)}</span>
                             <span className={t.pnl >= 0 ? 'text-[var(--green)] font-bold' : 'text-[var(--red)] font-bold'}>
-                              {t.pnl >= 0 ? '+' : ''}${t.pnl.toFixed(2)}
+                              {formatPnl(t.pnl, currency)}
                             </span>
                           </div>
                         ))}

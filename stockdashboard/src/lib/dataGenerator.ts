@@ -4,6 +4,8 @@ import { SYMBOLS, BASE_PRICES, INDICES, HISTORY_LENGTH, ORDER_BOOK_DEPTH } from 
 let priceStates: Record<string, { price: number; prevClose: number; high: number; low: number; open: number }> = {}
 let ohlcHistory: Record<string, OHLCData[]> = {}
 let indexStates: Record<string, { price: number }> = {}
+let activeSymbols = SYMBOLS
+let activeBasePrices = BASE_PRICES
 
 function seededRandom(seed: number): number {
   const x = Math.sin(seed * 9301 + 49297) * 49297
@@ -19,14 +21,17 @@ function normalRandom(seed: number): number {
 }
 
 function generateBasePrice(symbol: string): number {
-  return BASE_PRICES[symbol] || 100
+  return activeBasePrices[symbol] || 100
 }
 
 export function initializePrices(): Record<string, TickData> {
   const ticks: Record<string, TickData> = {}
   const now = Math.floor(Date.now() / 1000)
+  priceStates = {}
+  ohlcHistory = {}
+  indexStates = {}
 
-  SYMBOLS.forEach(({ symbol }, i) => {
+  activeSymbols.forEach(({ symbol }, i) => {
     const base = generateBasePrice(symbol)
     const seed = i * 1000
     const price = base + normalRandom(seed) * base * 0.02
@@ -98,6 +103,8 @@ let tickCounter = 0
 export function generateNextTick(symbol: string, _currentTick: TickData): TickData {
   tickCounter++
   const state = priceStates[symbol]
+  if (!state) return _currentTick
+
   const volatility = state.price * 0.002
   const drift = 0.0001
   const seed = tickCounter * 13 + symbol.charCodeAt(0) * 100
@@ -126,6 +133,8 @@ export function generateNextTick(symbol: string, _currentTick: TickData): TickDa
 
 export function generateOHLC(symbol: string, timestamp: number): OHLCData {
   const state = priceStates[symbol]
+  if (!state) return { time: Math.floor(timestamp / 1000), open: 0, high: 0, low: 0, close: 0, volume: 0 }
+
   const volatility = state.price * 0.003
   const seed = tickCounter * 17
   const open = state.price
@@ -195,6 +204,8 @@ export function generateOrderBook(_symbol: string, midPrice: number): OrderBookD
 export function generateIndexData(seed: number): IndexData[] {
   return INDICES.map(({ name, basePrice }, i) => {
     const state = indexStates[name]
+    if (!state) return { name, price: basePrice, change: 0, changePercent: 0 }
+
     const volatility = basePrice * 0.001
     const change = normalRandom(seed + i * 100) * volatility
     state.price = state.price + change
@@ -206,4 +217,17 @@ export function generateIndexData(seed: number): IndexData[] {
       changePercent: Math.round((change / state.price) * 10000) / 100,
     }
   })
+}
+
+export function setActiveSymbolsAndBasePrices(
+  symbols: { symbol: string; name: string }[],
+  basePrices: Record<string, number>
+): void {
+  activeSymbols = symbols
+  activeBasePrices = basePrices
+  tickCounter = 0
+}
+
+export function getActiveSymbols(): { symbol: string; name: string }[] {
+  return activeSymbols
 }

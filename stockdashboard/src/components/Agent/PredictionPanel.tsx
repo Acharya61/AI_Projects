@@ -1,13 +1,22 @@
 import { useState, useEffect } from 'react'
 import { usePredictions } from '../../hooks/usePredictions'
-import { SYMBOLS } from '../../lib/constants'
+import { useStore } from '../../store/store'
+import { formatPrice } from '../../data/currencies'
 
 export function PredictionPanel() {
   const [open, setOpen] = useState(false)
   const { predictions, performance, requestPrediction, requestAllPredictions, requestPerformance } = usePredictions()
+  const currency = useStore(s => s.prices.activeCurrency)
   const [horizonTicks, setHorizonTicks] = useState(10)
   const [horizonBars, setHorizonBars] = useState(5)
-  const [selectedSymbol, setSelectedSymbol] = useState(SYMBOLS[0].symbol)
+  const symbols = useStore(s => s.prices.symbols)
+  const [selectedSymbol, setSelectedSymbol] = useState(symbols[0]?.symbol || '')
+
+  useEffect(() => {
+    if (symbols.length > 0 && !symbols.some(s => s.symbol === selectedSymbol)) {
+      setSelectedSymbol(symbols[0].symbol)
+    }
+  }, [symbols, selectedSymbol])
 
   useEffect(() => {
     if (open) {
@@ -15,7 +24,7 @@ export function PredictionPanel() {
     }
   }, [open, requestPerformance])
 
-  const allSymbols = SYMBOLS.map(s => s.symbol)
+  const allSymbols = symbols.map(s => s.symbol)
   const strategies = ['sma', 'rsi', 'momentum']
 
   return (
@@ -143,7 +152,7 @@ export function PredictionPanel() {
                                       {(accuracy * 100).toFixed(0)}%
                                       {pnl !== null && pnl !== 0 && (
                                         <span className={`ml-1 ${pnl >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
-                                          (${pnl.toFixed(0)})
+                                          ({formatPrice(pnl, currency)})
                                         </span>
                                       )}
                                     </span>

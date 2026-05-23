@@ -1,6 +1,5 @@
 import { useEffect, useCallback } from 'react'
 import { useStore } from '../store/store'
-import { SYMBOLS } from '../lib/constants'
 
 export function useHotkeys() {
   const setActiveSymbol = useStore(s => s.setActiveSymbol)
@@ -36,8 +35,9 @@ export function useHotkeys() {
 
     if (e.key >= '1' && e.key <= '9') {
       const idx = parseInt(e.key) - 1
-      if (idx < SYMBOLS.length) {
-        setActiveSymbol(SYMBOLS[idx].symbol)
+      const symbols = useStore.getState().prices.symbols
+      if (idx < symbols.length) {
+        setActiveSymbol(symbols[idx].symbol)
       }
       return
     }

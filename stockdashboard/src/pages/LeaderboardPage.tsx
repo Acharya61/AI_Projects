@@ -8,6 +8,8 @@ const traders = [
   { rank: 7, name: 'paper_hands', return_pct: -8.3, trades: 445, win_rate: 43, pnl: -8300 },
 ]
 
+import { formatPrice } from '../data/currencies'
+
 export default function LeaderboardPage() {
   return (
     <div className="flex-1 overflow-auto p-4">
@@ -38,7 +40,7 @@ export default function LeaderboardPage() {
                 {t.win_rate}%
               </td>
               <td className={`text-right ${t.pnl >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
-                {t.pnl >= 0 ? '+' : ''}${t.pnl.toLocaleString()}
+                {formatPrice(t.pnl, 'USD')}
               </td>
             </tr>
           ))}

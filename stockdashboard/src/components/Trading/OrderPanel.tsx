@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useStore } from '../../store/store'
+import { formatPrice } from '../../data/currencies'
 
 export function OrderPanel() {
   const [side, setSide] = useState<'buy' | 'sell'>('buy')
@@ -9,6 +10,7 @@ export function OrderPanel() {
 
   const activeSymbol = useStore(s => s.prices.activeSymbol)
   const currentTick = useStore(s => s.prices.ticks[activeSymbol])
+  const currency = useStore(s => s.prices.activeCurrency)
   const buy = useStore(s => s.buy)
   const sell = useStore(s => s.sell)
   const cash = useStore(s => s.portfolio.cash)
@@ -88,15 +90,15 @@ export function OrderPanel() {
         <div className="text-xs text-[var(--text-secondary)] space-y-1">
           <div className="flex justify-between">
             <span>Price</span>
-            <span className="text-white">${price.toFixed(2)}</span>
+            <span className="text-white">{formatPrice(price, currency)}</span>
           </div>
           <div className="flex justify-between">
             <span>Total</span>
-            <span className="text-white">${total.toFixed(2)}</span>
+            <span className="text-white">{formatPrice(total, currency)}</span>
           </div>
           <div className="flex justify-between">
             <span>Available</span>
-            <span className="text-white">${cash.toFixed(2)}</span>
+            <span className="text-white">{formatPrice(cash, currency)}</span>
           </div>
           {position && (
             <div className="flex justify-between">

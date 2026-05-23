@@ -2,7 +2,6 @@ import type { StoreApi } from 'zustand/vanilla'
 import type { StoreState } from '../store/store'
 import { logOHLC, logTrade, logSnapshot, logIndicators } from './database'
 import { calcIndicators } from './indicators'
-import { SYMBOLS } from './constants'
 
 let snapshotInterval: ReturnType<typeof setInterval> | null = null
 let lastLoggedTime: Record<string, number> = {}
@@ -16,8 +15,9 @@ export function startLogger(store: StoreApi<StoreState>) {
   const unsub = store.subscribe((state, prevState) => {
     const history = state.prices.history
     const prevHistory = prevState.prices.history
+    const symbols = state.prices.symbols
 
-    SYMBOLS.forEach(({ symbol }) => {
+    symbols.forEach(({ symbol }) => {
       const bars = history[symbol]
       const prevBars = prevHistory[symbol]
       if (!bars || !prevBars) return

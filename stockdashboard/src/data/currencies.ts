@@ -46,3 +46,14 @@ export function formatCurrency(amount: number, currencyCode: string): string {
   if (!c) return `${currencyCode} ${amount.toFixed(2)}`
   return `${c.symbol}${amount.toLocaleString(c.locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 }
+
+export function formatPrice(amount: number, currencyCode: string): string {
+  const c = currencies.find(c => c.code === currencyCode)
+  if (!c) return `$${amount.toFixed(2)}`
+  return `${c.symbol}${amount.toFixed(2)}`
+}
+
+export function formatPnl(pnl: number, currencyCode: string): string {
+  const sign = pnl >= 0 ? '+' : ''
+  return `${sign}${formatPrice(pnl, currencyCode)}`
+}

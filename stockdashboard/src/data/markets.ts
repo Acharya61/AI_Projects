@@ -9,27 +9,132 @@ export interface MarketSymbol {
   sector?: string
 }
 
-export const stockSymbols: MarketSymbol[] = [
-  { symbol: 'AAPL', name: 'Apple Inc.', exchange: 'XNAS', type: 'stock', currency: 'USD', sector: 'Technology' },
-  { symbol: 'GOOGL', name: 'Alphabet Inc.', exchange: 'XNAS', type: 'stock', currency: 'USD', sector: 'Technology' },
-  { symbol: 'MSFT', name: 'Microsoft Corp.', exchange: 'XNAS', type: 'stock', currency: 'USD', sector: 'Technology' },
-  { symbol: 'AMZN', name: 'Amazon.com Inc.', exchange: 'XNAS', type: 'stock', currency: 'USD', sector: 'Consumer Cyclical' },
-  { symbol: 'TSLA', name: 'Tesla Inc.', exchange: 'XNAS', type: 'stock', currency: 'USD', sector: 'Automotive' },
-  { symbol: 'META', name: 'Meta Platforms Inc.', exchange: 'XNAS', type: 'stock', currency: 'USD', sector: 'Technology' },
-  { symbol: 'NVDA', name: 'NVIDIA Corp.', exchange: 'XNAS', type: 'stock', currency: 'USD', sector: 'Technology' },
-  { symbol: 'JPM', name: 'JPMorgan Chase & Co.', exchange: 'XNYS', type: 'stock', currency: 'USD', sector: 'Financial' },
-  { symbol: 'V', name: 'Visa Inc.', exchange: 'XNYS', type: 'stock', currency: 'USD', sector: 'Financial' },
-  { symbol: 'JNJ', name: 'Johnson & Johnson', exchange: 'XNYS', type: 'stock', currency: 'USD', sector: 'Healthcare' },
-  { symbol: 'TSCO.L', name: 'Tesco PLC', exchange: 'XLON', type: 'stock', currency: 'GBP', sector: 'Consumer Defensive' },
-  { symbol: 'SAP.DE', name: 'SAP SE', exchange: 'XETR', type: 'stock', currency: 'EUR', sector: 'Technology' },
-  { symbol: '7203.T', name: 'Toyota Motor', exchange: 'XTKS', type: 'stock', currency: 'JPY', sector: 'Automotive' },
-  { symbol: 'RELIANCE.NS', name: 'Reliance Industries Ltd.', exchange: 'XNSE', type: 'stock', currency: 'INR', sector: 'Energy' },
-  { symbol: 'TCS.NS', name: 'Tata Consultancy Services', exchange: 'XNSE', type: 'stock', currency: 'INR', sector: 'Technology' },
-  { symbol: 'INFY.NS', name: 'Infosys Ltd.', exchange: 'XNSE', type: 'stock', currency: 'INR', sector: 'Technology' },
-  { symbol: 'HDFCBANK.NS', name: 'HDFC Bank Ltd.', exchange: 'XNSE', type: 'stock', currency: 'INR', sector: 'Financial' },
-  { symbol: 'WIPRO.NS', name: 'Wipro Ltd.', exchange: 'XNSE', type: 'stock', currency: 'INR', sector: 'Technology' },
-  { symbol: '0700.HK', name: 'Tencent Holdings', exchange: 'XHKG', type: 'stock', currency: 'HKD', sector: 'Technology' },
-]
+export interface ExchangeStockList {
+  name: string
+  exchange: string
+  currency: string
+  country: string
+  top10: { symbol: string; name: string; basePrice: number }[]
+}
+
+export const EXCHANGE_STOCKS: Record<string, ExchangeStockList> = {
+  'NYSE': {
+    name: 'NYSE', exchange: 'XNYS', currency: 'USD', country: 'US',
+    top10: [
+      { symbol: 'JPM', name: 'JPMorgan Chase & Co.', basePrice: 198 },
+      { symbol: 'V', name: 'Visa Inc.', basePrice: 285 },
+      { symbol: 'JNJ', name: 'Johnson & Johnson', basePrice: 157 },
+      { symbol: 'WMT', name: 'Walmart Inc.', basePrice: 168 },
+      { symbol: 'KO', name: 'The Coca-Cola Co.', basePrice: 63 },
+      { symbol: 'PG', name: 'Procter & Gamble Co.', basePrice: 165 },
+      { symbol: 'HD', name: 'The Home Depot Inc.', basePrice: 354 },
+      { symbol: 'CVX', name: 'Chevron Corp.', basePrice: 191 },
+      { symbol: 'MCD', name: "McDonald's Corp.", basePrice: 267 },
+      { symbol: 'BA', name: 'The Boeing Co.', basePrice: 178 },
+    ],
+  },
+  'NASDAQ': {
+    name: 'NASDAQ', exchange: 'XNAS', currency: 'USD', country: 'US',
+    top10: [
+      { symbol: 'AAPL', name: 'Apple Inc.', basePrice: 198 },
+      { symbol: 'GOOGL', name: 'Alphabet Inc.', basePrice: 176 },
+      { symbol: 'MSFT', name: 'Microsoft Corp.', basePrice: 425 },
+      { symbol: 'AMZN', name: 'Amazon.com Inc.', basePrice: 187 },
+      { symbol: 'TSLA', name: 'Tesla Inc.', basePrice: 249 },
+      { symbol: 'META', name: 'Meta Platforms Inc.', basePrice: 512 },
+      { symbol: 'NVDA', name: 'NVIDIA Corp.', basePrice: 880 },
+      { symbol: 'NFLX', name: 'Netflix Inc.', basePrice: 640 },
+      { symbol: 'AMD', name: 'Advanced Micro Devices', basePrice: 162 },
+      { symbol: 'ADBE', name: 'Adobe Inc.', basePrice: 475 },
+    ],
+  },
+  'LSE': {
+    name: 'LSE', exchange: 'XLON', currency: 'GBP', country: 'GB',
+    top10: [
+      { symbol: 'AZN.L', name: 'AstraZeneca PLC', basePrice: 120 },
+      { symbol: 'SHEL.L', name: 'Shell PLC', basePrice: 28 },
+      { symbol: 'HSBA.L', name: 'HSBC Holdings PLC', basePrice: 7 },
+      { symbol: 'GSK.L', name: 'GSK PLC', basePrice: 16 },
+      { symbol: 'BP.L', name: 'BP PLC', basePrice: 5 },
+      { symbol: 'RIO.L', name: 'Rio Tinto PLC', basePrice: 54 },
+      { symbol: 'TSCO.L', name: 'Tesco PLC', basePrice: 3 },
+      { symbol: 'VOD.L', name: 'Vodafone Group PLC', basePrice: 1 },
+      { symbol: 'BARC.L', name: 'Barclays PLC', basePrice: 2 },
+      { symbol: 'LLOY.L', name: 'Lloyds Banking Group', basePrice: 1 },
+    ],
+  },
+  'NSE': {
+    name: 'NSE', exchange: 'XNSE', currency: 'INR', country: 'IN',
+    top10: [
+      { symbol: 'RELIANCE.NS', name: 'Reliance Industries Ltd.', basePrice: 245 },
+      { symbol: 'TCS.NS', name: 'Tata Consultancy Services', basePrice: 350 },
+      { symbol: 'INFY.NS', name: 'Infosys Ltd.', basePrice: 142 },
+      { symbol: 'HDFCBANK.NS', name: 'HDFC Bank Ltd.', basePrice: 152 },
+      { symbol: 'WIPRO.NS', name: 'Wipro Ltd.', basePrice: 42 },
+      { symbol: 'ICICIBANK.NS', name: 'ICICI Bank Ltd.', basePrice: 105 },
+      { symbol: 'ITC.NS', name: 'ITC Ltd.', basePrice: 42 },
+      { symbol: 'SBIN.NS', name: 'State Bank of India', basePrice: 72 },
+      { symbol: 'BAJFINANCE.NS', name: 'Bajaj Finance Ltd.', basePrice: 650 },
+      { symbol: 'HINDUNILVR.NS', name: 'Hindustan Unilever Ltd.', basePrice: 245 },
+    ],
+  },
+  'TSE': {
+    name: 'TSE', exchange: 'XTKS', currency: 'JPY', country: 'JP',
+    top10: [
+      { symbol: '7203.T', name: 'Toyota Motor Corp.', basePrice: 180 },
+      { symbol: '6758.T', name: 'Sony Group Corp.', basePrice: 95 },
+      { symbol: '9984.T', name: 'SoftBank Group Corp.', basePrice: 45 },
+      { symbol: '8306.T', name: 'Mitsubishi UFJ Financial', basePrice: 8 },
+      { symbol: '8035.T', name: 'Tokyo Electron Ltd.', basePrice: 220 },
+      { symbol: '6861.T', name: 'Keyence Corp.', basePrice: 400 },
+      { symbol: '9983.T', name: 'Fast Retailing Co.', basePrice: 210 },
+      { symbol: '8316.T', name: 'Sumitomo Mitsui Financial', basePrice: 7 },
+      { symbol: '6954.T', name: 'Fanuc Corp.', basePrice: 42 },
+      { symbol: '9432.T', name: 'Nippon Telegraph & Tel.', basePrice: 3 },
+    ],
+  },
+  'HKEX': {
+    name: 'HKEX', exchange: 'XHKG', currency: 'HKD', country: 'HK',
+    top10: [
+      { symbol: '0700.HK', name: 'Tencent Holdings Ltd.', basePrice: 380 },
+      { symbol: '9988.HK', name: 'Alibaba Group Holding Ltd.', basePrice: 75 },
+      { symbol: '3690.HK', name: 'Meituan', basePrice: 120 },
+      { symbol: '1810.HK', name: 'Xiaomi Corp.', basePrice: 18 },
+      { symbol: '9618.HK', name: 'JD.com Inc.', basePrice: 110 },
+      { symbol: '9888.HK', name: 'Baidu Inc.', basePrice: 95 },
+      { symbol: '1299.HK', name: 'AIA Group Ltd.', basePrice: 55 },
+      { symbol: '0005.HK', name: 'HSBC Holdings PLC', basePrice: 65 },
+      { symbol: '0011.HK', name: 'Hang Seng Bank Ltd.', basePrice: 95 },
+      { symbol: '0002.HK', name: 'CLP Holdings Ltd.', basePrice: 65 },
+    ],
+  },
+  'EURONEXT': {
+    name: 'EURONEXT', exchange: 'XPAR', currency: 'EUR', country: 'EU',
+    top10: [
+      { symbol: 'SAP.DE', name: 'SAP SE', basePrice: 180 },
+      { symbol: 'MC.PA', name: 'LVMH Moët Hennessy', basePrice: 750 },
+      { symbol: 'OR.PA', name: "L'Oréal S.A.", basePrice: 420 },
+      { symbol: 'AIR.PA', name: 'Airbus SE', basePrice: 145 },
+      { symbol: 'SAN.PA', name: 'Sanofi S.A.', basePrice: 95 },
+      { symbol: 'ALV.DE', name: 'Allianz SE', basePrice: 265 },
+      { symbol: 'SIE.DE', name: 'Siemens AG', basePrice: 175 },
+      { symbol: 'DTE.DE', name: 'Deutsche Telekom AG', basePrice: 24 },
+      { symbol: 'BNP.PA', name: 'BNP Paribas S.A.', basePrice: 65 },
+      { symbol: 'SU.PA', name: 'Schneider Electric SE', basePrice: 220 },
+    ],
+  },
+}
+
+export const stockSymbols: MarketSymbol[] = Object.values(EXCHANGE_STOCKS).flatMap(
+  ex => ex.top10.map(s => ({
+    symbol: s.symbol,
+    name: s.name,
+    exchange: ex.exchange,
+    type: 'stock' as MarketType,
+    currency: ex.currency,
+    sector: 'Various',
+  }))
+)
 
 export const futuresSymbols: MarketSymbol[] = [
   { symbol: 'ES', name: 'S&P 500 E-mini', exchange: 'CME', type: 'futures', currency: 'USD' },

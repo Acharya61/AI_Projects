@@ -115,3 +115,14 @@ export interface IndexData {
   change: number
   changePercent: number
 }
+
+export interface NewsItem {
+  id: string
+  time: number
+  source: string
+  headline: string
+  category: 'Market' | 'Company' | 'Earnings' | 'Macro' | 'Analyst'
+  impact: 'high' | 'medium' | 'low'
+  sentiment: 'bullish' | 'bearish' | 'neutral'
+  symbols: string[]
+}
