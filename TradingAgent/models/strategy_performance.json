@@ -1,0 +1,32 @@
+{
+  "sma": {
+    "AAPL": {
+      "predictions": 4,
+      "correct": 2,
+      "accuracy": 0.5,
+      "pnl": 20,
+      "total_pnl": 75.0,
+      "avg_return": 18.75
+    }
+  },
+  "s1": {
+    "TEST": {
+      "predictions": 5,
+      "correct": 5,
+      "accuracy": 1.0,
+      "pnl": 5,
+      "total_pnl": 9.0,
+      "avg_return": 1.8
+    }
+  },
+  "s": {
+    "X": {
+      "predictions": 4,
+      "correct": 4,
+      "accuracy": 1.0,
+      "pnl": -2,
+      "total_pnl": 7.0,
+      "avg_return": 1.75
+    }
+  }
+}

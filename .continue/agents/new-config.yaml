@@ -1,0 +1,28 @@
+name: Local Config 2
+version: 1.0.0
+schema: v1
+
+models:
+  - name: QwenCoder
+    provider: ollama
+    model: qwen2.5-coder:3b
+    defaultCompletionOptions:
+      contextLength: 4096
+    roles:
+      - chat
+      - edit
+      - apply
+      - autocomplete
+
+  - name: GemmaReasoning
+    provider: ollama
+    model: gemma3:1b
+    roles:
+      - chat
+
+  - name: LlamaBackup
+    provider: ollama
+    model: llama3.2
+    roles:
+      - chat
+      - summarize

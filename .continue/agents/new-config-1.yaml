@@ -1,0 +1,44 @@
+# This is an example configuration file
+# To learn more, see the full config.yaml reference: https://docs.continue.dev/reference
+
+name: Config-1
+version: 1.0.0
+schema: v1
+
+# Define which models can be used
+# https://docs.continue.dev/customization/models
+# ~/.continue/config.yaml
+models:
+  # --- THE ARCHITECT (Planning, Explaining, UI Logic, Analysis) ---
+  - title: "Gemma 3 1B"
+    provider: "ollama"
+    model: "gemma3:1b"
+    roles:
+      - chat # Keep it in the sidebar to talk out ideas
+
+  # --- THE BUILDER / VIBE CODER (Generates & Fills the Dashboard) ---
+  - title: "Qwen 2.5-Coder 3B"
+    provider: "ollama"
+    model: "qwen2.5-coder:3b"
+    roles:
+      - inlineEdit       # Uses Qwen for Ctrl+I code generation
+      - tabAutocomplete  # Uses Qwen for background autocomplete
+
+  # --- THE CONTEXT MANAGER ---
+  - title: "Llama 3.2 3B"
+    provider: "ollama"
+    model: "llama3.2"
+    roles:
+      - summarize
+
+# Force the main UI drop-down to default to Qwen when you start coding
+defaults:
+  model: "Qwen 2.5 Coder 3B"
+
+tabAutocompleteModel:
+  title: "Qwen 2.5 Coder 3B"
+  provider: "ollama"
+  model: "qwen2.5-coder:3b"
+
+
+

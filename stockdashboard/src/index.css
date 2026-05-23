@@ -1,0 +1,318 @@
+@import "tailwindcss";
+
+:root {
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #111111;
+  --bg-tertiary: #1a1a1a;
+  --bg-panel: #0d0d0d;
+  --text-primary: #c4c4c4;
+  --text-secondary: #6b7280;
+  --green: #00ff41;
+  --red: #ff3355;
+  --yellow: #f0b90b;
+  --cyan: #00d4ff;
+  --purple: #9747ff;
+  --orange: #ff8c00;
+  --border-color: #f0b90b;
+  --border-dim: #2a2a2a;
+  --neon-glow: 0 0 4px rgba(240, 185, 11, 0.3), 0 0 8px rgba(240, 185, 11, 0.1);
+  --font-mono: 'Courier New', 'Fira Code', 'Consolas', monospace;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-mono);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  overflow: hidden;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+#root {
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* CRT Scanline Overlay */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.15) 2px,
+    rgba(0, 0, 0, 0.15) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Custom Scrollbar - Terminal Style */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-dim);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 0;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #ffd700;
+  box-shadow: var(--neon-glow);
+}
+
+/* Panel Borders - Terminal Style */
+.terminal-panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--neon-glow);
+}
+
+.terminal-panel-dim {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-dim);
+}
+
+.terminal-panel-dim:hover {
+  border-color: var(--border-color);
+  box-shadow: var(--neon-glow);
+  transition: all 0.2s ease;
+}
+
+/* Neon Hover Effects */
+.neon-hover {
+  transition: all 0.15s ease;
+}
+.neon-hover:hover {
+  box-shadow: 0 0 6px rgba(240, 185, 11, 0.4), 0 0 12px rgba(240, 185, 11, 0.15);
+  border-color: var(--yellow) !important;
+}
+
+.neon-green:hover {
+  box-shadow: 0 0 6px rgba(0, 255, 65, 0.4);
+}
+.neon-red:hover {
+  box-shadow: 0 0 6px rgba(255, 51, 85, 0.4);
+}
+
+/* Glowing Text */
+.glow-yellow {
+  text-shadow: 0 0 4px rgba(240, 185, 11, 0.5), 0 0 8px rgba(240, 185, 11, 0.2);
+}
+.glow-green {
+  text-shadow: 0 0 4px rgba(0, 255, 65, 0.5), 0 0 8px rgba(0, 255, 65, 0.2);
+}
+.glow-red {
+  text-shadow: 0 0 4px rgba(255, 51, 85, 0.5), 0 0 8px rgba(255, 51, 85, 0.2);
+}
+
+/* Blinking Cursor Effect */
+.blink-cursor::after {
+  content: '▌';
+  animation: blink 1s step-end infinite;
+  color: var(--yellow);
+}
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* Ticker Tape */
+.ticker-tape {
+  white-space: nowrap;
+  overflow: hidden;
+}
+.ticker-tape-inner {
+  display: inline-block;
+  animation: ticker-scroll 30s linear infinite;
+}
+@keyframes ticker-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Pulsing Status Dot */
+.pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.pulse-dot.green {
+  background: var(--green);
+  box-shadow: 0 0 4px var(--green);
+  animation: pulse-green 2s infinite;
+}
+.pulse-dot.red {
+  background: var(--red);
+  box-shadow: 0 0 4px var(--red);
+  animation: pulse-red 2s infinite;
+}
+.pulse-dot.yellow {
+  background: var(--yellow);
+  box-shadow: 0 0 4px var(--yellow);
+  animation: pulse-yellow 2s infinite;
+}
+@keyframes pulse-green {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+@keyframes pulse-red {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+@keyframes pulse-yellow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* Sidebar Navigation */
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  transition: all 0.15s ease;
+}
+.sidebar-link:hover {
+  color: var(--yellow);
+  background: rgba(240, 185, 11, 0.05);
+  border-left-color: var(--yellow);
+}
+.sidebar-link.active {
+  color: var(--yellow);
+  background: rgba(240, 185, 11, 0.08);
+  border-left-color: var(--yellow);
+  text-shadow: 0 0 4px rgba(240, 185, 11, 0.3);
+}
+
+/* Data Table - Terminal Style */
+.terminal-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+.terminal-table th {
+  text-align: left;
+  padding: 6px 8px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-dim);
+  font-weight: normal;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.terminal-table td {
+  padding: 4px 8px;
+  border-bottom: 1px solid rgba(42, 42, 42, 0.5);
+}
+.terminal-table tr:hover td {
+  background: rgba(240, 185, 11, 0.03);
+}
+
+/* Input/Select Styling */
+.terminal-input {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-dim);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 6px 10px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.terminal-input:focus {
+  border-color: var(--border-color);
+  box-shadow: var(--neon-glow);
+}
+
+/* Button Styles */
+.btn-terminal {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 6px 14px;
+  border: 1px solid var(--border-dim);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.btn-terminal:hover {
+  border-color: var(--border-color);
+  box-shadow: var(--neon-glow);
+  color: var(--yellow);
+}
+.btn-terminal.primary {
+  border-color: var(--border-color);
+  color: black;
+  background: var(--yellow);
+  font-weight: bold;
+}
+.btn-terminal.primary:hover {
+  box-shadow: 0 0 8px rgba(240, 185, 11, 0.6);
+}
+.btn-terminal.danger {
+  border-color: var(--red);
+  color: var(--red);
+}
+.btn-terminal.danger:hover {
+  box-shadow: 0 0 8px rgba(255, 51, 85, 0.4);
+  background: rgba(255, 51, 85, 0.1);
+}
+.btn-terminal.success {
+  border-color: var(--green);
+  color: var(--green);
+}
+.btn-terminal.success:hover {
+  box-shadow: 0 0 8px rgba(0, 255, 65, 0.4);
+  background: rgba(0, 255, 65, 0.1);
+}
+
+/* Card */
+.terminal-card {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-dim);
+}
+.terminal-card:hover {
+  border-color: var(--border-color);
+}
+
+/* Section Title */
+.section-title {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-dim);
+  padding-bottom: 4px;
+  margin-bottom: 8px;
+}
+
+/* Price Movement */
+.price-up { color: var(--green); }
+.price-down { color: var(--red); }
+
+/* Animation: slide up for toasts */
+@keyframes slide-up {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.animate-slide-up {
+  animation: slide-up 0.2s ease-out;
+}
