@@ -1,2 +1,28 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Python
+*.py text diff=python
+
+# TypeScript / JavaScript
+*.ts text
+*.tsx text
+*.js text
+*.jsx text
+*.json text
+
+# Shell / Batch
+*.bat text eol=crlf
+*.ps1 text
+
+# Markdown / Docs
+*.md text
+*.txt text
+
+# Binary files
+*.png binary
+*.jpg binary
+*.ico binary
+*.svg text
+*.woff binary
+*.woff2 binary
